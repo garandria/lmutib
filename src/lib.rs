@@ -104,3 +104,17 @@ pub fn diffconfig(config1: &Path, config2: &Path)
     }
     comparison
 }
+
+pub fn get_bool_tristate(configuration: &HashMap<String, String>)
+                     -> HashMap<String, String> {
+
+    let mut bool_tristate: HashMap<String, String> = HashMap::new();
+    for (key, value) in configuration {
+        if value == "y" || value == "m" || value == "n" {
+            bool_tristate.insert(key.to_string(), value.to_string());
+        }
+    }
+
+    bool_tristate
+}
+
