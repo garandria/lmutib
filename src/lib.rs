@@ -118,3 +118,16 @@ pub fn get_bool_tristate(configuration: &HashMap<String, String>)
     bool_tristate
 }
 
+pub fn get_random_key(pconfig: &HashMap<String, String>) -> String {
+
+    let mut rng = thread_rng();
+    let rval = rng.gen_range(0..pconfig.len());
+    let mut pconfig_iter = pconfig.keys();
+
+    for _ in 1..rval {
+        pconfig_iter.next();
+    }
+
+    pconfig_iter.next().unwrap().to_string()
+}
+
