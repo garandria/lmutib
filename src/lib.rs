@@ -163,4 +163,20 @@ impl KernelDir {
             .output()
             .expect("failed to exectue randconfig process.");
     }
+
+    pub fn build(&self) -> Result<(), ()>{
+        let output = Command::new("/usr/bin/time")
+            .args(["-p", "-a", "-o", "t+time", "--format=%e", "make", "-j16"])
+            .current_dir(self.get_workdir())
+            .output()
+            .expect("failed to execute build process.");
+
+        let _ = fs::File::create("t+build").unwrap().write_all(&output.stdout);
+
+        if !output.status.success() {
+            let _ = fs::File::create("t+error").unwrap().write_all(&output.stderr);
+            return Err(());
+        }
+        Ok(())
+    }
 }
