@@ -131,3 +131,6 @@ pub fn get_random_key(pconfig: &HashMap<String, String>) -> String {
     pconfig_iter.next().unwrap().to_string()
 }
 
+pub struct KernelDir {
+    pub git: Repository,
+}
