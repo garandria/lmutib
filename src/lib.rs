@@ -135,3 +135,7 @@ pub fn get_random_key(pconfig: &HashMap<String, String>) -> String {
 pub struct KernelDir {
     pub git: Repository,
 }
+
+impl KernelDir {
+
+}
