@@ -3,6 +3,7 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use rand::{thread_rng, Rng};
+use git2::Repository;
 
 
 pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
