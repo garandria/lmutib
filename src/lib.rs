@@ -138,4 +138,16 @@ pub struct KernelDir {
 
 impl KernelDir {
 
+    pub fn new(p: &str) -> Self {
+        let repo = match Repository::open(p) {
+            Ok(repo) => repo,
+            Err(_) => {
+                match Repository::init(p) {
+                    Ok(repo) => repo,
+                    Err(e) => panic!("failed to init: {}", e),
+                }
+            },
+        };
+        Self {git: repo}
+    }
 }
