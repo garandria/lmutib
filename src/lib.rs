@@ -154,4 +154,12 @@ impl KernelDir {
     fn get_workdir(&self) -> &str {
         self.git.workdir().unwrap().to_str().unwrap()
     }
+
+    pub fn randconfig(&self) {
+        let _ = Command::new("make")
+            .arg("randconfig")
+            .current_dir(self.get_workdir())
+            .output()
+            .expect("failed to exectue randconfig process.");
+    }
 }
