@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+use rand::{thread_rng, Rng};
 
 
 pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
