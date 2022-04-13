@@ -150,4 +150,8 @@ impl KernelDir {
         };
         Self {git: repo}
     }
+
+    fn get_workdir(&self) -> &str {
+        self.git.workdir().unwrap().to_str().unwrap()
+    }
 }
