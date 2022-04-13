@@ -179,4 +179,11 @@ impl KernelDir {
         }
         Ok(())
     }
+
+    pub fn get_time(&self) -> Option<String>{
+        match fs::read_to_string(&[self.get_workdir(), "t+time"].join("/")) {
+            Ok(content) => Some(content),
+            Err(_)   => None,
+        }
+    }
 }
