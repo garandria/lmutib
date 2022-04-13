@@ -3,6 +3,41 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+
+pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
+
+    let file = match fs::File::open(trace) {
+        Ok(file) => file,
+        Err(err) => panic!("Error: {:?} {}", trace, err),
+    };
+
+    let mut tasks: HashMap<String, HashMap<String, String>> = HashMap::new();
+
+    for line in BufReader::new(file).lines()
+        .filter(|l| l.is_ok()).map(|l| l.unwrap()) {
+            if line.starts_with("set -e;  echo '  ") {
+                let echoed = line.strip_prefix("set -e;  echo '  ")
+                    .unwrap().trim();
+                let mut splitted = echoed[..echoed.find('\'').unwrap()]
+                    .split_whitespace();
+                let rule = splitted.nth(0).unwrap().to_string();
+                let target = splitted.nth(0).unwrap().to_string();
+                let cmd = echoed[echoed.find(';').unwrap()+1..]
+                    .trim().to_string();
+
+                if !tasks.contains_key(&rule) {
+                    tasks.insert(String::from(&rule), HashMap::new());
+                }
+                if let Some(table) = tasks.get_mut(&rule) {
+                    table.insert(String::from(&target), String::from(&cmd));
+                }
+            }
+        }
+
+    tasks
+}
+
+
 pub fn readconfig(config: &Path) -> HashMap<String, String> {
 
     let file = match fs::File::open(config) {
