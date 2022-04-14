@@ -161,7 +161,7 @@ impl KernelDir {
             .arg("randconfig")
             .current_dir(self.get_workdir())
             .output()
-            .expect("failed to exectue randconfig process.");
+            .expect("make: failed to exectue randconfig process.");
     }
 
     pub fn build(&self) -> Result<(), ()>{
