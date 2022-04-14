@@ -202,9 +202,22 @@ impl KernelDir {
     }
 
     fn add_all(&self) -> Result<Oid, git2::Error>{
+
+        let cb = &mut |path: &Path, _matched_spec: &[u8]| -> i32 {
+            let status = self.git.status_file(path).unwrap();
+            if status.contains(git2::Status::WT_MODIFIED)
+                || status.contains(git2::Status::WT_NEW){
+                    0
+                }else {
+                    1
+                }
+        };
+
         let mut index = self.git.index()
             .expect("git: cannot get the Index file.");
-        index.add_all(["*"].iter(), IndexAddOption::DEFAULT, None)
+        index.add_all(["*"].iter(),
+                      IndexAddOption::DEFAULT,
+                      Some(cb as &mut git2::IndexMatchedPath))
             .expect("git: failed to add -f *");
         index.write().expect("git: failed to write modification.");
         index.write_tree()
