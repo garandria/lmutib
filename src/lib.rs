@@ -184,4 +184,14 @@ impl KernelDir {
     pub fn get_time(&self) -> Option<String>{
         fs::read_to_string(&[self.get_workdir(), "t+time"].join("/")).ok()
     }
+
+    fn add_all(&self) -> Result<Oid, git2::Error>{
+        let mut index = self.git.index()
+            .expect("git: cannot get the Index file.");
+        index.add_all(["*"].iter(), IndexAddOption::DEFAULT, None)
+            .expect("git: failed to add -f *");
+        index.write().expect("git: failed to write modification.");
+        index.write_tree()
+    }
+
 }
