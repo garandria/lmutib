@@ -195,10 +195,11 @@ impl KernelDir {
             .output()
             .expect("/usr/bin/time: failed to execute build process.");
 
-        let _ = fs::File::create("t+build").unwrap().write_all(&output.stdout);
+        let _ = fs::File::create(self.to_workdir("t+build"))
+            .unwrap().write_all(&output.stdout);
 
         if !output.status.success() {
-            let _ = fs::File::create("t+error").unwrap()
+            let _ = fs::File::create(self.to_workdir("t+error")).unwrap()
                 .write_all(&output.stderr);
             return Err(());
         }
@@ -206,7 +207,7 @@ impl KernelDir {
     }
 
     pub fn get_time(&self) -> Option<String>{
-        fs::read_to_string(&[self.get_workdir(), "t+time"].join("/")).ok()
+        fs::read_to_string(self.to_workdir("t+time")).ok()
     }
 
     fn add_all(&self) -> Result<Oid, git2::Error>{
