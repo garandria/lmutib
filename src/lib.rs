@@ -176,6 +176,10 @@ impl KernelDir {
         self.git.workdir().unwrap().to_str().unwrap()
     }
 
+    fn to_workdir(&self, dir: &str) -> String {
+        [self.get_workdir(), dir].join("").to_string()
+    }
+
     pub fn randconfig(&self) {
         let _ = Command::new("make")
             .arg("randconfig")
