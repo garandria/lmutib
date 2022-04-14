@@ -150,17 +150,18 @@ impl KernelDir {
             },
         };
 
-        let kd = Self {git: repo};
-
         //
-        let mut config = kd.git.config().expect("git: failed getting config.");
-        config.set_str("user.name", "Tux")
+        repo.config().unwrap().set_str("user.name", "Tux")
             .expect("git: failed to set user.name.");
-        config.set_str("user.email", "")
+        repo.config().unwrap().set_str("user.email", "")
             .expect("git: failed to set user.email.");
+        repo.config().unwrap().set_bool("advice.addIgnoredFile", false)
+            .expect("git: failed to set advice.addIgnoredFile");
 
         // Ignore all trace files we produce with the pattern t+...
-        kd.git.add_ignore_rule("t+*").expect("git: failed adding ignore rule.");
+        repo.add_ignore_rule("t+*").expect("git: failed adding ignore rule.");
+
+        let kd = Self {git: repo};
 
         // snapshot
         kd.save("source");
