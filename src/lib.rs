@@ -163,6 +163,9 @@ impl KernelDir {
 
         let kd = Self {git: repo};
 
+        let _ = Command::new("rm").arg(".gitignore")
+            .current_dir(kd.get_workdir()).output();
+
         // snapshot
         kd.save("source");
 
