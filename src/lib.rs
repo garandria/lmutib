@@ -194,4 +194,30 @@ impl KernelDir {
         index.write_tree()
     }
 
+    pub fn save(&self, msg: &str) {
+        let signature = git2::Signature::now("Tux", "TuxEmail").unwrap();
+        let tree_id = self.add_all().unwrap();
+        let tree = self.git.find_tree(tree_id).unwrap();
+        let head = self.git.head();
+        match head {
+            Ok(h) => {
+                let _ = self.git.commit(Some("HEAD"),
+                                        &signature,
+                                        &signature,
+                                        msg,
+                                        &tree,
+                                        &[&h.peel_to_commit().unwrap()]
+                );
+            }
+            Err(_)   => {
+                let _ = self.git.commit(Some("HEAD"),
+                                        &signature,
+                                        &signature,
+                                        msg,
+                                        &tree,
+                                        &[]
+                );
+            }
+        }
+    }
 }
