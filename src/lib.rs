@@ -149,7 +149,23 @@ impl KernelDir {
                 }
             },
         };
-        Self {git: repo}
+
+        let kd = Self {git: repo};
+
+        //
+        let mut config = kd.git.config().expect("git: failed getting config.");
+        config.set_str("user.name", "Tux")
+            .expect("git: failed to set user.name.");
+        config.set_str("user.email", "")
+            .expect("git: failed to set user.email.");
+
+        // Ignore all trace files we produce with the pattern t+...
+        kd.git.add_ignore_rule("t+*").expect("git: failed adding ignore rule.");
+
+        // snapshot
+        kd.save("source");
+
+        kd
     }
 
     fn get_workdir(&self) -> &str {
