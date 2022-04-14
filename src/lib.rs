@@ -168,7 +168,7 @@ impl KernelDir {
         kd
     }
 
-    fn get_workdir(&self) -> &str {
+    pub fn get_workdir(&self) -> &str {
         self.git.workdir().unwrap().to_str().unwrap()
     }
 
