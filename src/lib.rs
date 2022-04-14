@@ -174,7 +174,8 @@ impl KernelDir {
         let _ = fs::File::create("t+build").unwrap().write_all(&output.stdout);
 
         if !output.status.success() {
-            let _ = fs::File::create("t+error").unwrap().write_all(&output.stderr);
+            let _ = fs::File::create("t+error").unwrap()
+                .write_all(&output.stderr);
             return Err(());
         }
         Ok(())
