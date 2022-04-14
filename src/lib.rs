@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use rand::{thread_rng, Rng};
 use std::process::Command;
-use git2::Repository;
+use git2::{Index, IndexAddOption, Repository, Oid, Error};
 
 
 pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
