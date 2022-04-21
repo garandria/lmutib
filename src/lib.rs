@@ -133,56 +133,99 @@ pub fn get_random_key(pconfig: &HashMap<String, String>) -> String {
     pconfig_iter.next().unwrap().to_string()
 }
 
+pub fn kernel_download(version: &str) -> Result<String, ()> {
+
+    let url = ["https://cdn.kernel.org/pub/linux/kernel/v",
+               &version[..version.find('.').unwrap()],
+               ".x/linux-", version, ".tar.gz"].join("");
+
+    if !Command::new("wget").arg(&url).status().unwrap().success() {
+        return Err(());
+    }
+
+    Ok(url[url.rfind('/').unwrap()+1..].to_string())
+}
+
+pub fn extract_tar(file: &str, dst: &str) -> Result<String, std::io::Error>{
+    Archive::new(GzDecoder::new(fs::File::open(file)?)).unpack(dst)?;
+    let mut sep = String::new();
+    if dst.chars().last().unwrap() != '/' {
+        sep.push_str("/");
+    }
+    Ok([dst, file.strip_suffix(".tar.gz").unwrap()].join(&sep))
+}
+
 pub struct KernelDir {
-    pub git: Repository,
+    pub git: String,
 }
 
 impl KernelDir {
 
     pub fn new(p: &str) -> Self {
-        let repo = match Repository::open(p) {
-            Ok(repo) => repo,
-            Err(_) => {
-                match Repository::init(p) {
-                    Ok(repo) => repo,
-                    Err(e) => panic!("failed to init: {}", e),
-                }
-            },
-        };
-
-        //
-        repo.config().unwrap().set_str("user.name", "Tux")
-            .expect("git: failed to set user.name.");
-        repo.config().unwrap().set_str("user.email", "")
-            .expect("git: failed to set user.email.");
-        repo.config().unwrap().set_bool("advice.addIgnoredFile", false)
-            .expect("git: failed to set advice.addIgnoredFile");
-
-        // Ignore all trace files we produce with the pattern t+...
-        repo.add_ignore_rule("t+*").expect("git: failed adding ignore rule.");
-
-        let kd = Self {git: repo};
-
-        let _ = Command::new("rm").arg(".gitignore")
-            .current_dir(kd.get_workdir()).output();
-
-        // snapshot
+        if !Path::new(&[p, ".git"].join("/")).is_dir(){
+            let _ = Command::new("git")
+                .arg("init")
+                .current_dir(p)
+                .output()
+                .expect("git: failed init.");
+        }
+        let kd = Self {git: p.to_string()};
+        kd.add_all();
         kd.save("source");
-
         kd
     }
 
+    pub fn add_all(&self) {
+        let _ = Command::new("git")
+            .args(["add", "-f", "*"])
+            .current_dir(&self.git)
+            .output()
+            .expect("git: failed add");
+    }
+
+    pub fn save(&self, msg: &str){
+        let _ = Command::new("git")
+            .args(["commit", "-m", msg])
+            .current_dir(&self.git)
+            .output()
+            .expect("git: failed to commit");
+    }
+
+    pub fn create_new_branch(&self, branch: &str) {
+        let _ = Command::new("git")
+            .args(["checkout", "-b", branch])
+            .current_dir(&self.git)
+            .output()
+            .expect("git: failed to create branch");
+    }
+
+    pub fn checkout(&self, branch: &str) {
+        let _ = Command::new("git")
+            .args(["checkout", branch])
+            .current_dir(&self.git)
+            .output()
+            .expect("git: failed to checkout");
+    }
+
     pub fn get_workdir(&self) -> &str {
-        self.git.workdir().unwrap().to_str().unwrap()
+        &self.git
     }
 
     fn to_workdir(&self, dir: &str) -> String {
-        [self.get_workdir(), dir].join("").to_string()
+        [self.get_workdir(), dir].join("/").to_string()
     }
 
     pub fn randconfig(&self) {
         let _ = Command::new("make")
             .arg("randconfig")
+            .current_dir(self.get_workdir())
+            .output()
+            .expect("make: failed to exectue randconfig process.");
+    }
+
+    pub fn defconfig(&self) {
+        let _ = Command::new("make")
+            .arg("defconfig")
             .current_dir(self.get_workdir())
             .output()
             .expect("make: failed to exectue randconfig process.");
@@ -206,56 +249,18 @@ impl KernelDir {
         Ok(())
     }
 
+    pub fn makeni_trace(&self) {
+        let output = Command::new("make")
+            .args(["-ni"])
+            .current_dir(self.get_workdir())
+            .output()
+            .expect("make: failed to exectue randconfig process.");
+
+        let _ = fs::File::create(self.to_workdir("t+makeni"))
+            .unwrap().write_all(&output.stdout);
+    }
+
     pub fn get_time(&self) -> Option<String>{
         fs::read_to_string(self.to_workdir("t+time")).ok()
-    }
-
-    fn add_all(&self) -> Result<Oid, git2::Error>{
-
-        let cb = &mut |path: &Path, _matched_spec: &[u8]| -> i32 {
-            let status = self.git.status_file(path).unwrap();
-            if status.contains(git2::Status::WT_MODIFIED)
-                || status.contains(git2::Status::WT_NEW){
-                    0
-                }else {
-                    1
-                }
-        };
-
-        let mut index = self.git.index()
-            .expect("git: cannot get the Index file.");
-        index.add_all(["*"].iter(),
-                      IndexAddOption::DEFAULT,
-                      Some(cb as &mut git2::IndexMatchedPath))
-            .expect("git: failed to add -f *");
-        index.write().expect("git: failed to write modification.");
-        index.write_tree()
-    }
-
-    pub fn save(&self, msg: &str) {
-        let signature = git2::Signature::now("Tux", "TuxEmail").unwrap();
-        let tree_id = self.add_all().unwrap();
-        let tree = self.git.find_tree(tree_id).unwrap();
-        let head = self.git.head();
-        match head {
-            Ok(h) => {
-                let _ = self.git.commit(Some("HEAD"),
-                                        &signature,
-                                        &signature,
-                                        msg,
-                                        &tree,
-                                        &[&h.peel_to_commit().unwrap()]
-                );
-            }
-            Err(_)   => {
-                let _ = self.git.commit(Some("HEAD"),
-                                        &signature,
-                                        &signature,
-                                        msg,
-                                        &tree,
-                                        &[]
-                );
-            }
-        }
     }
 }
