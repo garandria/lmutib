@@ -167,7 +167,11 @@ impl KernelDir {
             .expect("git: failed to commit");
     }
 
-    pub fn create_new_branch(&self, branch: &str) {
+    pub fn create_new_branch(&self, from: Option<&str>, branch: &str) {
+        if from.is_some() {
+            self.checkout(from.unwrap());
+        }
+
         let _ = Command::new("git")
             .args(["checkout", "-b", branch])
             .current_dir(&self.git)
