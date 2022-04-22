@@ -5,6 +5,8 @@ use std::path::Path;
 use rand::{thread_rng, Rng};
 use std::process::Command;
 use git2::{Index, IndexAddOption, Repository, Oid, Error};
+use flate2::read::GzDecoder;
+use tar::Archive;
 
 
 pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
