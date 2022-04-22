@@ -107,32 +107,6 @@ pub fn diffconfig(config1: &Path, config2: &Path)
     comparison
 }
 
-pub fn get_bool_tristate(configuration: &HashMap<String, String>)
-                     -> HashMap<String, String> {
-
-    let mut bool_tristate: HashMap<String, String> = HashMap::new();
-    for (key, value) in configuration {
-        if value == "y" || value == "m" || value == "n" {
-            bool_tristate.insert(key.to_string(), value.to_string());
-        }
-    }
-
-    bool_tristate
-}
-
-pub fn get_random_key(pconfig: &HashMap<String, String>) -> String {
-
-    let mut rng = thread_rng();
-    let rval = rng.gen_range(0..pconfig.len());
-    let mut pconfig_iter = pconfig.keys();
-
-    for _ in 1..rval {
-        pconfig_iter.next();
-    }
-
-    pconfig_iter.next().unwrap().to_string()
-}
-
 pub fn kernel_download(version: &str) -> Result<String, ()> {
 
     let url = ["https://cdn.kernel.org/pub/linux/kernel/v",
