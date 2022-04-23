@@ -146,6 +146,14 @@ impl KernelDir {
                 .expect("git: failed init.");
         }
         let kd = Self {git: p.to_string()};
+        let _ = Command::new("git")
+            .args(["config", "user.name", "Tux"])
+            .output()
+            .expect("git: failed config user.name");
+        let _ = Command::new("git")
+            .args(["config", "user.email", "Tux@Tux.Tux"])
+            .output()
+            .expect("git: failed config user.email");
         kd.add_all();
         kd.save("source");
         kd
