@@ -2,9 +2,8 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
-use rand::{thread_rng, Rng};
 use std::process::Command;
-use git2::{Index, IndexAddOption, Repository, Oid, Config};
+use git2::{IndexAddOption, Repository, Oid, Config};
 use flate2::read::GzDecoder;
 use tar::Archive;
 
