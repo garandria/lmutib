@@ -119,7 +119,7 @@ pub fn diffconfig(config1: &Path, config2: &Path)
 
 pub fn build(source: &str) -> Result<(), ()>{
     let output = Command::new("/usr/bin/time")
-        .args(["-p", "-a", "-o", "t+time", "--format=%e", "make", "-j16"])
+        .args(["-p", "-o", "t+time", "--format=%e", "make", "-j16"])
         .current_dir(source)
         .output()
         .expect("/usr/bin/time: failed to execute build process.");
