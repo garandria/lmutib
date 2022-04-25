@@ -14,6 +14,7 @@ fn main() {
     println!("└───────────────────────────┘");
 
     println!("  → Kernel directory: {}", kernel);
+    fs::remove_file([kernel, ".gitignore"].join("/"));
     print!("  → Initializing git directory...");
     let git = lmutib::MyGit::new(kernel);
     println!(" ✓");
