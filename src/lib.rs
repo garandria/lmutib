@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use rand::{thread_rng, Rng};
 use std::process::Command;
-use git2::{Index, IndexAddOption, Repository, Oid, Error};
+use git2::{Index, IndexAddOption, Repository, Oid, Config};
 use flate2::read::GzDecoder;
 use tar::Archive;
 
@@ -131,126 +131,102 @@ pub fn extract_tar(file: &str, dst: &str) -> Result<String, std::io::Error>{
     Ok([dst, file.strip_suffix(".tar.gz").unwrap()].join(&sep))
 }
 
-pub struct KernelDir {
-    pub git: String,
+
+pub struct MyGit {
+    pub repo: Repository,
 }
 
-impl KernelDir {
+impl MyGit {
 
-    pub fn new(p: &str) -> Self {
-        if !Path::new(&[p, ".git"].join("/")).is_dir(){
-            let _ = Command::new("git")
-                .arg("init")
-                .current_dir(p)
-                .output()
-                .expect("git: failed init.");
+    pub fn new(folder: &str) -> Self {
+        Self {repo: Repository::init(folder).unwrap()}
+    }
+
+    pub fn config(&self, user_name: &str, user_email: &str)
+                  -> Result <Config, git2::Error>{
+
+        let mut conf = Config::new().unwrap();
+        let path_str = [&self.repo.path().to_str().unwrap(),
+                        "config"].join("/");
+        conf.add_file(Path::new(&path_str),
+                      git2::ConfigLevel::Local,
+                      true)?;
+        conf.set_str("user.name", user_name)?;
+        conf.set_str("user.email", user_email)?;
+        Ok(conf)
+    }
+
+    pub fn add_all(&self) -> Result<Oid, git2::Error>{
+
+        let cb = &mut |path: &Path, _matched_spec: &[u8]| -> i32 {
+            let status = self.repo.status_file(path).unwrap();
+            if status.contains(git2::Status::WT_MODIFIED)
+                || status.contains(git2::Status::WT_NEW){
+                    0
+                }else {
+                    1
+                }
+        };
+
+        let mut index = self.repo.index()
+            .expect("MyGit: cannot get the Index file.");
+        index.add_all(["*"].iter(),
+                      IndexAddOption::DEFAULT,
+                      Some(cb as &mut git2::IndexMatchedPath))
+            .expect("MyGit: failed to add -f *");
+        index.write().expect("MyGit: failed to write modification.");
+        index.write_tree()
+    }
+
+    pub fn commit(&self, msg: &str, tree_id: Oid) -> Result<Oid, git2::Error>  {
+        let signature = self.repo.signature().unwrap();
+        let tree = self.repo.find_tree(tree_id).unwrap();
+        let head = self.repo.head();
+        let ret: Result<Oid, git2::Error>;
+        match head {
+            Ok(h) => {
+                ret = self.repo.commit(Some("HEAD"),
+                                        &signature,
+                                        &signature,
+                                        msg,
+                                        &tree,
+                                        &[&h.peel_to_commit().unwrap()]
+                );
+            }
+            Err(_)   => {
+                ret = self.repo.commit(Some("HEAD"),
+                                        &signature,
+                                        &signature,
+                                        msg,
+                                        &tree,
+                                        &[]
+                );
+            }
         }
-        let kd = Self {git: p.to_string()};
-        let _ = Command::new("git")
-            .args(["config", "user.name", "Tux"])
-            .current_dir(p)
-            .output()
-            .expect("git: failed config user.name");
-        let _ = Command::new("git")
-            .args(["config", "user.email", "Tux@Tux.Tux"])
-            .current_dir(p)
-            .output()
-            .expect("git: failed config user.email");
-        kd.add_all();
-        kd.save("source");
-        kd
+        ret
     }
 
-    pub fn add_all(&self) {
-        let _ = Command::new("git")
-            .args(["add", "-f", "*"])
-            .current_dir(&self.git)
-            .output()
-            .expect("git: failed add");
-    }
-
-    pub fn save(&self, msg: &str){
-        let _ = Command::new("git")
-            .args(["commit", "-m", msg])
-            .current_dir(&self.git)
-            .output()
-            .expect("git: failed to commit");
-    }
-
-    pub fn create_new_branch(&self, from: Option<&str>, branch: &str) {
-        if from.is_some() {
-            self.checkout(from.unwrap());
-        }
-
-        let _ = Command::new("git")
-            .args(["checkout", "-b", branch])
-            .current_dir(&self.git)
-            .output()
-            .expect("git: failed to create branch");
+    pub fn create_branch(&self, branch_name: &str, src_commit: Oid) {
+        let srccommit = self.repo.find_commit(src_commit).unwrap();
+        let _ = self.repo.branch(branch_name, &srccommit, false);
     }
 
     pub fn checkout(&self, branch: &str) {
-        let _ = Command::new("git")
-            .args(["checkout", branch])
-            .current_dir(&self.git)
-            .output()
-            .expect("git: failed to checkout");
+        let (object, reference) = self.repo.revparse_ext(branch).expect("Object not found");
+
+        self.repo.checkout_tree(&object, None)
+            .expect("Failed to checkout");
+
+        match reference {
+            // gref is an actual reference like branches or tags
+            Some(gref) => self.repo.set_head(gref.name().unwrap()),
+            // this is a commit, not a reference
+            None => self.repo.set_head_detached(object.id()),
+        }
+        .expect("Failed to set HEAD");
     }
 
     pub fn get_workdir(&self) -> &str {
-        &self.git
-    }
-
-    fn to_workdir(&self, dir: &str) -> String {
-        [self.get_workdir(), dir].join("/").to_string()
-    }
-
-    pub fn randconfig(&self) {
-        let _ = Command::new("make")
-            .arg("randconfig")
-            .current_dir(self.get_workdir())
-            .output()
-            .expect("make: failed to exectue randconfig process.");
-    }
-
-    pub fn defconfig(&self) {
-        let _ = Command::new("make")
-            .arg("defconfig")
-            .current_dir(self.get_workdir())
-            .output()
-            .expect("make: failed to exectue randconfig process.");
-    }
-
-    pub fn build(&self) -> Result<(), ()>{
-        let output = Command::new("/usr/bin/time")
-            .args(["-p", "-a", "-o", "t+time", "--format=%e", "make", "-j16"])
-            .current_dir(self.get_workdir())
-            .output()
-            .expect("/usr/bin/time: failed to execute build process.");
-
-        let _ = fs::File::create(self.to_workdir("t+build"))
-            .unwrap().write_all(&output.stdout);
-
-        if !output.status.success() {
-            let _ = fs::File::create(self.to_workdir("t+error")).unwrap()
-                .write_all(&output.stderr);
-            return Err(());
-        }
-        Ok(())
-    }
-
-    pub fn makeni_trace(&self) {
-        let output = Command::new("make")
-            .args(["-ni"])
-            .current_dir(self.get_workdir())
-            .output()
-            .expect("make: failed to exectue randconfig process.");
-
-        let _ = fs::File::create(self.to_workdir("t+makeni"))
-            .unwrap().write_all(&output.stdout);
-    }
-
-    pub fn get_time(&self) -> Option<String>{
-        fs::read_to_string(self.to_workdir("t+time")).ok()
+        &self.repo.workdir().unwrap().to_str().unwrap()
     }
 }
