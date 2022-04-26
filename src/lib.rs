@@ -136,6 +136,18 @@ pub fn build(source: &str) -> Result<(), ()>{
 }
 
 
+pub fn makeni_trace(source: &str){
+    let output = Command::new("make")
+        .args(["-n", "-i"])
+        .current_dir(source)
+        .output()
+        .expect("make -ni: failed to execute build process.");
+
+    let _ = fs::File::create([source, "t+makeni"].join("/"))
+        .unwrap().write_all(&output.stdout);
+}
+
+
 pub fn kernel_download(version: &str) -> Result<String, ()> {
 
     let url = ["https://cdn.kernel.org/pub/linux/kernel/v",
