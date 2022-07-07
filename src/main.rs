@@ -8,7 +8,7 @@ mod build;
 fn main() {
 
     let folder  = "/home/linux-5.13";
-    let configs = "/tmp/configs";
+    let configs = "/home/configs";
     println!("Creating Build folder...");
     let kernel = build::Build::new(folder);
     println!("Initializing...");
