@@ -20,7 +20,8 @@ fn main() {
     let b = kernel.config_name_from_path(&cc);
     for conf in fs::read_dir(Path::new(configs)).unwrap()
         .filter(|f| f.is_ok()).map(|f| f.unwrap().path()
-                                   .to_str().unwrap().to_string()){
+                                   .to_str().unwrap().to_string())
+        .filter(|f| !f.ends_with("config")){
             let curr = Path::new(&conf);
             println!("{}: Clean Build", conf);
             kernel.clean_build(&curr);
