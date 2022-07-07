@@ -26,7 +26,7 @@ fn main() {
             println!("{}: Clean Build", conf);
             kernel.clean_build(&curr);
             println!("{}: Incremental Build", conf);
-            kernel.incremental_build(&b, &curr);
+            kernel.incremental_build(&[&b, "cb"].join("-"), &curr);
         }
     println!("-- End, Reporting:");
     kernel.report()
