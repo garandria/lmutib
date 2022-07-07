@@ -1,4 +1,5 @@
-use git2::{IndexAddOption, Repository, Oid, Config};
+use git2::{IndexAddOption, Repository, Oid, Config, Branches};
+use std::path::Path;
 
 pub struct Git {
     repository: Repository
@@ -86,7 +87,7 @@ impl Git {
 
     pub fn create_branch(&self, branch_name: &str, src_commit: Oid) {
         let srccommit = self.repository.find_commit(src_commit).unwrap();
-        let _ = self.repository.branch(branch_name, &srccommit, false);
+        let _ = self.repository.branch(branch_name, &srccommit, true);
     }
 
     pub fn checkout(&self, branch: &str) {
