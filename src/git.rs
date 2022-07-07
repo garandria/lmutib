@@ -116,4 +116,8 @@ impl Git {
         &self.repository.workdir().unwrap().to_str().unwrap()
     }
 
+    pub fn branches(&self) ->  Result<Branches<'_>, git2::Error> {
+        self.repository.branches(None)
+    }
+
 }
