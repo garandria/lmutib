@@ -105,6 +105,13 @@ impl Git {
         .expect("Failed to set HEAD");
     }
 
+    pub fn get_last_commit(&self) -> Result<Oid, git2::Error> {
+        let h_ref = self.repository.head()?;
+        let commit = h_ref.peel_to_commit()?;
+        Ok(commit.id())
+    }
+
+
     pub fn get_workdir(&self) -> &str {
         &self.repository.workdir().unwrap().to_str().unwrap()
     }
