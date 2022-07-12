@@ -53,7 +53,7 @@ pub fn diffconfig(config1: &Path, config2: &Path)
                                     c2.get(k).unwrap().to_string()));
             }
         }else {
-            if c1.get(k) != "n" {
+            if c1.get(k).unwrap() != "n" {
                 comparison.get_mut("-").unwrap()
                     .insert(k.to_string(), v.to_string());
             }
