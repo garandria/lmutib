@@ -28,6 +28,13 @@ impl Build {
         self.git.get_workdir()
     }
 
+    // 1.
+    // config_name_from_path("/home/configs/___configOPT_XXX_y-0")
+    //         ->  home|configs|OPT_XXX_y
+    // 2.
+    // config_name_from_path("/home/configs/rand")
+    //         -> home|configs|rand
+    //
     pub fn config_name_from_path(&self, config: &Path) -> String {
         let configprefix = "___config";
         let pref = config.strip_prefix("/").unwrap().parent().unwrap()
