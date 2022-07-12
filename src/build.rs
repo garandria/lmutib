@@ -103,10 +103,10 @@ impl Build {
                          results.get(&[parent.to_string(), "cb".to_string()].join("-")).unwrap(), v,
                          diff.get("+").unwrap().len(), diff.get("-").unwrap().len(), diff.get("~").unwrap().len());
 
-            }else {
-                let name = self.extract_config_from_bname(&k);
-                println!("{},--,{},--,--,--,--", name, v);
-            }
+            }//else {
+            //     let name = self.extract_config_from_bname(&k);
+            //     println!("{},--,{},--,--,--,--", name, v);
+            // }
         }
     }
 
