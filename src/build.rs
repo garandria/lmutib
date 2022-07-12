@@ -97,11 +97,20 @@ impl Build {
                 self.git.checkout(&k);
                 let parent = self.extract_parent_from_bname(&k);
                 let name = self.extract_config_from_bname(&k);
-                let diff = lmutib::diffconfig(Path::new(&[self.get_workdir(), ".config.old"].join("/")),
-                                              Path::new(&[self.get_workdir(), ".config"].join("/")));
-                println!("{},{},{},{},{},{},{}", name, &parent,
-                         results.get(&[parent.to_string(), "cb".to_string()].join("-")).unwrap(), v,
-                         diff.get("+").unwrap().len(), diff.get("-").unwrap().len(), diff.get("~").unwrap().len());
+                let diff = lmutib::diffconfig(
+                    Path::new(
+                        &[self.get_workdir(), ".config.old"].join("/")),
+                    Path::new(
+                        &[self.get_workdir(), ".config"].join("/")));
+                println!("{},{},{},{},{},{},{}",
+                         name,
+                         &parent,
+                         results.get(&[name.to_string(), "cb".to_string()]
+                                     .join("-")).unwrap(),
+                         v,
+                         diff.get("+").unwrap().len(),
+                         diff.get("-").unwrap().len(),
+                         diff.get("~").unwrap().len());
 
             }//else {
             //     let name = self.extract_config_from_bname(&k);
