@@ -73,7 +73,9 @@ impl Build {
             name.strip_suffix("-cb").unwrap().to_string()
         }else {
             let mut splitted = name.split("-");
-            splitted.next(); splitted.next(); splitted.next().unwrap().to_string()
+            splitted.next();
+            splitted.next();
+            splitted.next().unwrap().to_string()
         }
     }
 
