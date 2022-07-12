@@ -147,8 +147,9 @@ impl Build {
         let new_branch_name: String;
         if branch == "master" {
             new_branch_name =
-                [self.config_name_from_path(config), "cb".to_string()].join("-")
-                .to_string();
+                [self.config_name_from_path(config),
+                 "cb".to_string()]
+                .join("-").to_string();
         }else {
             new_branch_name =
                 [branch, &self.config_name_from_path(config),
