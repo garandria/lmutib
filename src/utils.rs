@@ -100,3 +100,12 @@ pub fn mkf_ni_trace(trace: &Path) -> HashMap<String, HashMap<String, String>> {
 
     tasks
 }
+
+pub fn mkf_ni_trace_total(table: HashMap<String, HashMap<String, String>>)
+                          -> usize {
+    let mut total = 0;
+    for (_, v) in &table {
+        total += v.len();
+    }
+    total
+}
