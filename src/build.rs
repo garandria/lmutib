@@ -30,22 +30,22 @@ impl Build {
 
     // 1.
     // config_name_from_path("/home/configs/___configOPT_XXX_y-0")
-    //         ->  home|configs|OPT_XXX_y
+    //         ->  "home,configs,OPT_XXX_y"
     // 2.
     // config_name_from_path("/home/configs/rand")
-    //         -> home|configs|rand
+    //         -> "home,configs,rand"
     //
     pub fn config_name_from_path(&self, config: &Path) -> String {
         let configprefix = "___config";
         let pref = config.strip_prefix("/").unwrap().parent().unwrap()
-            .to_str().unwrap().replace("/", "|");
+            .to_str().unwrap().replace("/", ",");
         let f = config.file_name().unwrap().to_str().unwrap();
         if f.starts_with(configprefix) {
             let extr = f.strip_prefix(configprefix)
                 .unwrap().split("-").next().unwrap();
-            [pref, extr.to_string()].join("|").to_string()
+            [pref, extr.to_string()].join(",").to_string()
         }else {
-            [pref, f.to_string()].join("|").to_string()
+            [pref, f.to_string()].join(",").to_string()
         }
     }
 
