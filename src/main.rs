@@ -67,11 +67,14 @@ fn main() {
 			        println!("\t  - Clean Build...");
 			        io::stdout().flush().unwrap();
 			        kernel.clean_build(&curr);
-			        println!("\t  - Incremental Build...");
-			        io::stdout().flush().unwrap();
-			        kernel.incremental_build(&[&branch, "cb"].join("-"), &curr);
-		        }
-	    }
+
+                    if (!all_clean) {
+			            println!("\t  - Incremental Build...");
+			            io::stdout().flush().unwrap();
+			            kernel.incremental_build(&[&branch, "cb"].join("-"), &curr);
+		            }
+	            }
+        }
 
 }
 
