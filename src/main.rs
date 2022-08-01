@@ -1,6 +1,6 @@
-// use lmutib;
+use lmutib;
 use std::fs;
-// use std::io::{self, Write};
+use std::io::{self, Write};
 use std::path::Path;
 mod git;
 mod build;
