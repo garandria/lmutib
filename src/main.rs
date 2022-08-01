@@ -11,8 +11,9 @@ fn main() {
     let matches = Command::new("Lmutib")
         .version("1.0")
         .about("Experimenting IB")
-        .arg(arg!(--src <VALUE>))
-        .arg(arg!(--confs <VALUE>))
+        .arg(arg!(--src <VALUE>).required(true))
+        .arg(arg!(--confs <VALUE>).required(true))
+        .arg(arg!(--clean).action(ArgAction::SetTrue))
         .get_matches();
 
     println!(
@@ -24,6 +25,7 @@ fn main() {
         matches.get_one::<String>("confs").expect("required")
     );
 
+    let all_clean = matches.get_one::<bool>("clean").unwrap();
 
     let source = matches.get_one::<String>("src").expect("required");
     let configs  = matches.get_one::<String>("confs").expect("required");
