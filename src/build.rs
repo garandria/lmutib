@@ -1,5 +1,5 @@
 use crate::git::Git;
-use lmutib;
+use crate::utils;
 use std::process::Command;
 use std::io::Write;
 use std::path::Path;
@@ -97,7 +97,7 @@ impl Build {
                 self.git.checkout(&k);
                 let parent = self.extract_parent_from_bname(&k);
                 let name = self.extract_config_from_bname(&k);
-                let diff = lmutib::diffconfig(
+                let diff = utils::diffconfig(
                     Path::new(
                         &[self.get_workdir(), ".config.old"].join("/")),
                     Path::new(

@@ -1,3 +1,8 @@
+use std::collections::HashMap;
+use std::fs;
+use std::io::{BufRead, BufReader, Write};
+use std::path::Path;
+use std::process::Command;
 
 
 pub fn readconfig(config: &Path) -> HashMap<String, String> {
