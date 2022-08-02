@@ -14,6 +14,7 @@ fn main() {
         .arg(arg!(--src <VALUE>).required(true))
         .arg(arg!(--confs <VALUE>).required(true))
         .arg(arg!(--clean).action(ArgAction::SetTrue))
+        .arg(arg!(--report).action(ArgAction::SetTrue))
         .get_matches();
 
     println!(
@@ -25,7 +26,6 @@ fn main() {
         matches.get_one::<String>("confs").expect("required")
     );
 
-    let all_clean = matches.get_one::<bool>("clean").unwrap();
 
     let source = matches.get_one::<String>("src").expect("required");
     let configs  = matches.get_one::<String>("confs").expect("required");
@@ -35,6 +35,14 @@ fn main() {
     println!("Initializing...");
     io::stdout().flush().unwrap();
     kernel.init();
+
+    if *matches.get_one::<bool>("report").unwrap() {
+        kernel.report();
+        return
+    }
+
+    let all_clean = matches.get_one::<bool>("clean").unwrap();
+
     for metadir in fs::read_dir(Path::new(configs)).unwrap()
         .filter(|f| f.is_ok())
         .map(|f| f.unwrap().path().to_str().unwrap().to_string()) {
