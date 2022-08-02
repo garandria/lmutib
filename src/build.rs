@@ -121,7 +121,7 @@ impl Build {
 
     pub fn build(&self) -> Result<(), ()>{
         let output = Command::new("/usr/bin/time")
-            .args(["-p", "-o", "t+time", "--format=%e", "make", "-j16"])
+            .args(["-p", "-o", "t+time", "--format=%e", "make", "-j128"])
             .current_dir(self.git.get_workdir())
             .output()
             .expect("/usr/bin/time: failed to execute build process.");
