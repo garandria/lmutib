@@ -65,7 +65,7 @@ fn main() {
 		    for conf in fs::read_dir(Path::new(&metadir)).unwrap()
 		        .filter(|f| f.is_ok()).map(|f| f.unwrap().path().to_str()
                                            .unwrap().to_string())
-		        .filter(|f| !f.contains("_base")){
+		        .filter(|f| !f.contains("base")){
 		 	        println!("\t* {}", conf);
 			        io::stdout().flush().unwrap();
 			        let curr = Path::new(&conf);
