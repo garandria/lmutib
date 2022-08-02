@@ -41,7 +41,7 @@ fn main() {
 		    println!("-> {}", metadir);
 		    io::stdout().flush().unwrap();
 
-            let branch = String::new();
+            let mut branch = String::new();
             if !all_clean {
 		        let mut basename = String::new();
 
@@ -60,7 +60,7 @@ fn main() {
 		        println!("\t  Clean build...");
 		        io::stdout().flush().unwrap();
 		        kernel.clean_build(&baseconf_path);
-		        let branch = kernel.config_name_from_path(&baseconf_path);
+		        branch = kernel.config_name_from_path(&baseconf_path);
             }
 		    for conf in fs::read_dir(Path::new(&metadir)).unwrap()
 		        .filter(|f| f.is_ok()).map(|f| f.unwrap().path().to_str()
