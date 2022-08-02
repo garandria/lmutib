@@ -120,4 +120,10 @@ impl Git {
         self.repository.branches(None)
     }
 
+    pub fn branch_exists(&self, branch_name: &str) -> bool {
+        self.repository.find_branch(branch_name,
+                                    git2::BranchType::Local)
+            .is_ok()
+    }
+
 }
