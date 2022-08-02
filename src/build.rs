@@ -155,20 +155,27 @@ impl Build {
                 [branch, &self.config_name_from_path(config),
                  "ib"].join("-").to_string();
         }
-        self.git.create_branch(&new_branch_name, last);
-        self.git.checkout(&new_branch_name);
-        // move config here
-        if branch != "master" {
-            let _ = fs::copy([self.get_workdir(), ".config"].join("/"),
-                             [self.get_workdir(), ".config.old"].join("/"));
+
+        if !self.git.branch_exists(&new_branch_name){
+            self.git.create_branch(&new_branch_name, last);
         }
-        let _ = fs::copy(config.to_str().unwrap(),
-                         [self.get_workdir(), ".config"].join("/"));
-        // build
-        let _ = self.build();
-        // add and commit
-        let oid = self.git.add_all().unwrap();
-        let _ = self.git.commit("Build", oid);
+
+        self.git.checkout(&new_branch_name);
+
+        if !self.git.branch_exists(&new_branch_name){
+            // move config here
+            if branch != "master" {
+                let _ = fs::copy([self.get_workdir(), ".config"].join("/"),
+                                 [self.get_workdir(), ".config.old"].join("/"));
+            }
+            let _ = fs::copy(config.to_str().unwrap(),
+                             [self.get_workdir(), ".config"].join("/"));
+            // build
+            let _ = self.build();
+            // add and commit
+            let oid = self.git.add_all().unwrap();
+            let _ = self.git.commit("Build", oid);
+        }
     }
 
     pub fn clean_build(&self, config: &Path) {
