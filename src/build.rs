@@ -156,13 +156,12 @@ impl Build {
                  "ib"].join("-").to_string();
         }
 
-        if !self.git.branch_exists(&new_branch_name){
+        if self.git.branch_exists(&new_branch_name) {
+            println!(" already done.");
+            self.git.checkout(&new_branch_name);
+        } else {
             self.git.create_branch(&new_branch_name, last);
-        }
-
-        self.git.checkout(&new_branch_name);
-
-        if !self.git.branch_exists(&new_branch_name){
+            self.git.checkout(&new_branch_name);
             // move config here
             if branch != "master" {
                 let _ = fs::copy([self.get_workdir(), ".config"].join("/"),
