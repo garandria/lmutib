@@ -63,8 +63,19 @@ impl Build {
         if name.ends_with("cb") {
             "--".to_string()
         }else {
-            let mut splitted = name.split("-");
-            splitted.next().unwrap().to_string()
+            let mut splitted = name.split("+");
+            let par = splitted.next().unwrap().to_string();
+            let sp2: Vec<&str> = par.split(",").collect();
+            sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
+            // let sp2 = splitted.next().unwrap().to_string().split(",").collect();
+            // sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
+            // let mut n = &sp2.next_back().unwrap().to_string();
+            // if n.ends_with("-cb") {
+            //     n.replace("-cb", "");
+            // }else if n.ends_with("-ib") {
+            //     n.replace("-ib", "");
+            // }
+            // n
         }
     }
 
@@ -72,10 +83,14 @@ impl Build {
         if name.ends_with("cb") {
             name.strip_suffix("-cb").unwrap().to_string()
         }else {
-            let mut splitted = name.split("-");
+            let mut splitted = name.split("+");
             splitted.next();
-            splitted.next();
-            splitted.next().unwrap().to_string()
+            let chi = splitted.next().unwrap().to_string();
+            let sp2: Vec<&str> = chi.split(",").collect();
+            sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
+            // splitted.next();
+            // splitted.next();
+            // splitted.next().unwrap().to_string()
         }
     }
 
