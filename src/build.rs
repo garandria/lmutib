@@ -153,7 +153,7 @@ impl Build {
         }else {
             new_branch_name =
                 [branch, &self.config_name_from_path(config),
-                 "ib"].join("-").to_string();
+                 "ib"].join("+").to_string();
         }
 
         if self.git.branch_exists(&new_branch_name) {
