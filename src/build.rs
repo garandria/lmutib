@@ -122,7 +122,7 @@ impl Build {
                 println!("{},{},{},{},{},{},{}",
                          name,
                          &parent,
-                         results.get(&[name.to_string(), "cb".to_string()]
+                         results.get(&[name.split("-").next().unwrap().to_string(), "cb".to_string()]
                                      .join("-")).unwrap(),
                          v,
                          diff.get("+").unwrap().len(),
