@@ -64,9 +64,10 @@ impl Build {
             "--".to_string()
         }else {
             let mut splitted = name.split("+");
-            let par = splitted.next().unwrap().to_string();
-            let sp2: Vec<&str> = par.split(",").collect();
-            sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
+            //let par =
+            splitted.next().unwrap().to_string()
+            //let sp2: Vec<&str> = par.split(",").collect();
+            //sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
             // let sp2 = splitted.next().unwrap().to_string().split(",").collect();
             // sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
             // let mut n = &sp2.next_back().unwrap().to_string();
@@ -85,9 +86,10 @@ impl Build {
         }else {
             let mut splitted = name.split("+");
             splitted.next();
-            let chi = splitted.next().unwrap().to_string();
-            let sp2: Vec<&str> = chi.split(",").collect();
-            sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
+            //let chi =
+            splitted.next().unwrap().to_string()
+            // let sp2: Vec<&str> = chi.split(",").collect();
+            // sp2.last().unwrap().to_string().split("-").next().unwrap().to_string()
             // splitted.next();
             // splitted.next();
             // splitted.next().unwrap().to_string()
