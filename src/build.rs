@@ -105,7 +105,7 @@ impl Build {
                 if self.build_ok() {
                     results.insert(b, self.build_time());
                 }else {
-                    results.insert(b, "--".to_string());
+                    results.insert(b, "err".to_string());
                 }
             }
         println!("name,parent,clean,incremental,add,remove,change");
