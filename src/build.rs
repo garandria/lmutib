@@ -171,7 +171,7 @@ impl Build {
             let woib = [branch, &self.config_name_from_path(config)].join("+")
                 .to_string();
             new_branch_name =
-                [&woib, "ib"].join("+").to_string();
+                [&woib, "ib"].join("-").to_string();
         }
 
         if self.git.branch_exists(&new_branch_name) {
