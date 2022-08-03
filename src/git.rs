@@ -38,6 +38,8 @@ impl Git {
                 let status = self.repository.status_file(path).unwrap();
                 if status.contains(git2::Status::WT_MODIFIED)
                     || status.contains(git2::Status::WT_NEW)
+                    || status.contains(git2::Status::INDEX_NEW)
+                    || status.contains(git2::Status::INDEX_MODIFIED)
                     || status.contains(git2::Status::IGNORED)
                     || status.contains(git2::Status::WT_DELETED){
                         0
