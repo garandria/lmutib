@@ -119,7 +119,7 @@ impl Build {
                         &[self.get_workdir(), ".config.old"].join("/")),
                     Path::new(
                         &[self.get_workdir(), ".config"].join("/")));
-                println!("{},{},{},{},{},{},{}",
+                println!("{} {} {} {} {} {} {}",
                          name,
                          &parent,
                          results.get(&[name.split("-").next().unwrap().to_string(), "cb".to_string()]
