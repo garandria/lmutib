@@ -129,10 +129,12 @@ impl Build {
                          diff.get("-").unwrap().len(),
                          diff.get("~").unwrap().len());
 
-            }//else {
-            //     let name = self.extract_config_from_bname(&k);
-            //     println!("{},--,{},--,--,--,--", name, v);
-            // }
+            } else {
+                if k.contains("base"){
+                    let name = self.extract_config_from_bname(&k);
+                    println!("{} -- {} -- -- -- --", name, v);
+                }
+            }
         }
     }
 
